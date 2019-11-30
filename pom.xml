@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>org.springframework.boot</groupId>
+		<artifactId>spring-boot-starter-parent</artifactId>
+		<version>2.2.1.RELEASE</version>
+		<relativePath/> <!-- lookup parent from repository -->
+	</parent>
+	<groupId>com.lk</groupId>
+	<artifactId>runner-api</artifactId>
+	<version>0.0.1-SNAPSHOT</version>
+	<name>runner-api</name>
+	<description>runner-api</description>
+
+	<properties>
+		<maven-assembly-plugin.version>2.4</maven-assembly-plugin.version>
+		<copy-rename-maven-plugin.version>1.0.1</copy-rename-maven-plugin.version>
+		<java.version>1.8</java.version>
+	</properties>
+
+	<dependencies>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-actuator</artifactId>
+		</dependency>
+		<!--<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-security</artifactId>
+		</dependency>-->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-web</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-test</artifactId>
+			<scope>test</scope>
+			<exclusions>
+				<exclusion>
+					<groupId>org.junit.vintage</groupId>
+					<artifactId>junit-vintage-engine</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+<!--		<dependency>
+			<groupId>org.springframework.security</groupId>
+			<artifactId>spring-security-test</artifactId>
+			<scope>test</scope>
+		</dependency>
+-->	</dependencies>
+
+	<build>
+		<pluginManagement>
+			<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-assembly-plugin</artifactId>
+				<version>${maven-assembly-plugin.version}</version>
+			</plugin>
+			</plugins>
+		</pluginManagement>
+		<plugins>
+			<plugin>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-maven-plugin</artifactId>
+			</plugin>
+			<plugin>
+				<artifactId>maven-resources-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>copy-resources</id>
+						<phase>validate</phase>
+						<goals><goal>copy-resources</goal></goals>
+						<configuration>
+							<outputDirectory>${build.directory}/classes/static/</outputDirectory >
+							<resources>
+								<resource>
+									<directory>../runner-go/dist/runner-go/</directory>
+								</resource>
+							</resources>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+
+				<plugin>
+					<artifactId>maven-assembly-plugin</artifactId>
+					<configuration>
+						<finalName>runner-api</finalName>
+						<appendAssemblyId>false</appendAssemblyId>
+						<descriptors>
+							<descriptor>/src/assembly/assembly.xml</descriptor>
+						</descriptors>
+					</configuration>
+					<executions>
+						<execution>
+							<id>package-native</id>
+							<phase>install</phase>
+							<goals>
+								<goal>attached</goal>
+							</goals>
+						</execution>
+					</executions>
+				</plugin>
+
+				<plugin>
+					<groupId>org.springframework.boot</groupId>
+					<artifactId>spring-boot-maven-plugin</artifactId>
+					<configuration>
+						<executable>true</executable>
+					</configuration>
+					<executions>
+						<execution>
+							<goals>
+								<goal>build-info</goal>
+							</goals>
+						</execution>
+					</executions>
+				</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-failsafe-plugin</artifactId>
+					<configuration>
+						<skip>true</skip>
+					</configuration>
+				</plugin>
+				<plugin>
+					<groupId>com.coderplus.maven.plugins</groupId>
+					<artifactId>copy-rename-maven-plugin</artifactId>
+					<version>${copy-rename-maven-plugin.version}</version>
+					<executions>
+						<execution>
+							<id>copy-properties-file</id>
+							<phase>package</phase>
+							<goals>
+								<goal>copy</goal>
+							</goals>
+							<configuration>
+								<sourceFile>target/${project.artifactId}-${project.version}.${project.packaging}
+								</sourceFile>
+								<destinationFile>target/${project.artifactId}.${project.packaging}</destinationFile>
+							</configuration>
+						</execution>
+					</executions>
+				</plugin>
+
+
+
+		</plugins>
+		<resources>
+			<resource>
+				<directory>src/main/resources</directory>
+				<excludes>
+					<exclude>**/environment/</exclude>
+				</excludes>
+			</resource>
+		</resources>
+
+	</build>
+
+</project>
